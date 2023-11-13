@@ -18,6 +18,7 @@ int WinMain()
         }
     }
 
+    int winner = 0;
 
     while (window.isOpen())
     {
@@ -56,28 +57,43 @@ int WinMain()
 
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            sf::Vector2i position = sf::Mouse::getPosition(window) / 300;
-            if (zones[position.x + position.y * 3].painter == 0)
+            sf::Vector2i position = sf::Mouse::getPosition(window);
+            if (position.x > 0 && position.x < window.getSize().x && position.y > 0 && position.y < window.getSize().y)
             {
-                zones[position.x + position.y * 3].painter = painter;
-
-                // 0 1 2
-                // 3 4 5
-                // 6 7 8
-                // 0,1,2  3,4,5  6,7,8  0,3,6  1,4,7  2,5,8  0,4,8  2,4,6
-                if ((zones[0].painter != 0 && zones[0].painter == zones[1].painter && zones[0].painter == zones[2].painter) ||
-                    (zones[3].painter != 0 && zones[3].painter == zones[4].painter && zones[3].painter == zones[5].painter) ||
-                    (zones[6].painter != 0 && zones[6].painter == zones[7].painter && zones[6].painter == zones[8].painter) ||
-                    (zones[0].painter != 0 && zones[0].painter == zones[3].painter && zones[0].painter == zones[6].painter) ||
-                    (zones[1].painter != 0 && zones[1].painter == zones[4].painter && zones[1].painter == zones[7].painter) ||
-                    (zones[2].painter != 0 && zones[2].painter == zones[5].painter && zones[2].painter == zones[8].painter) ||
-                    (zones[0].painter != 0 && zones[0].painter == zones[4].painter && zones[0].painter == zones[8].painter) ||
-                    (zones[2].painter != 0 && zones[2].painter == zones[4].painter && zones[2].painter == zones[6].painter))
+                position /= 300;
+                if (zones[position.x + position.y * 3].painter == 0)
                 {
-                    int winner = painter;
+                    zones[position.x + position.y * 3].painter = painter;
+
+                    // 0 1 2
+                    // 3 4 5
+                    // 6 7 8
+                    // 0,1,2  3,4,5  6,7,8  0,3,6  1,4,7  2,5,8  0,4,8  2,4,6
+                    if ((zones[0].painter != 0 && zones[0].painter == zones[1].painter && zones[0].painter == zones[2].painter) ||
+                        (zones[3].painter != 0 && zones[3].painter == zones[4].painter && zones[3].painter == zones[5].painter) ||
+                        (zones[6].painter != 0 && zones[6].painter == zones[7].painter && zones[6].painter == zones[8].painter) ||
+                        (zones[0].painter != 0 && zones[0].painter == zones[3].painter && zones[0].painter == zones[6].painter) ||
+                        (zones[1].painter != 0 && zones[1].painter == zones[4].painter && zones[1].painter == zones[7].painter) ||
+                        (zones[2].painter != 0 && zones[2].painter == zones[5].painter && zones[2].painter == zones[8].painter) ||
+                        (zones[0].painter != 0 && zones[0].painter == zones[4].painter && zones[0].painter == zones[8].painter) ||
+                        (zones[2].painter != 0 && zones[2].painter == zones[4].painter && zones[2].painter == zones[6].painter))
+                    {
+                        winner = painter;
+                    }
+                    painter *= -1;
                 }
-                painter *= -1;
             }
+        }
+        if (winner != 0)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                zones[i].Draw(&window);
+            }
+            window.display();
+            while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
+            while (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
+            return 0;
         }
     }
 
