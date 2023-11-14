@@ -1,8 +1,50 @@
 #include "Zone.h"
 #include <SFML/Window/Mouse.hpp>
+#include <string>
+#include <WS2tcpip.h>
+#pragma comment(lib, "ws2_32.lib")
 
-int WinMain()
+using namespace std;
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+    string Host = "127.0.0.1"; // Server IP
+    int Port = 5004; // Server Port
+
+    WSAData data;
+    WORD ver = MAKEWORD(2, 2);
+    int wsResult = WSAStartup(ver, &data);
+
+    if (wsResult != 0)
+    {
+        MessageBox(0, 0, L"Can't start winsocket, error #" + wsResult, 0);
+    }
+
+    SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == INVALID_SOCKET)
+    {
+        MessageBox(0, 0, L"Can't create socket, error #" + WSAGetLastError(), 0);
+        WSACleanup();
+        return 0;
+    }
+
+    sockaddr_in hint;
+    hint.sin_family = AF_INET;
+    hint.sin_port = htons(Port);
+    inet_pton(AF_INET, Host.c_str(), &hint.sin_addr);
+
+    int connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
+    if (connResult == SOCKET_ERROR)
+    {
+        MessageBox(0, 0, L"Can't connect to server, error #" + WSAGetLastError(), 0);
+        closesocket(sock);
+        WSACleanup();
+        return 0;
+    }
+
+    char buf[4096];
+    string userInput;
+
     sf::RenderWindow window(sf::VideoMode(900, 900), "SFML works!");
     std::vector<zone> zones;
     int painter = zone::painterList::CIRCLE;
@@ -80,6 +122,34 @@ int WinMain()
                     {
                         winner = painter;
                     }
+
+                    if (winner != 0)
+                    {
+                        if (winner == -1)
+                        {
+                            userInput = "W1";
+                        }
+                        else if (winner == 1)
+                        {
+                            userInput = "W2";
+                        }
+                    }
+                    else
+                    {
+                        userInput = "P" + to_string(painter) + "X" + to_string(position.x) + "Y" + to_string(position.y);
+                    }
+
+                    int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
+                    if (sendResult != SOCKET_ERROR)
+                    {
+                        ZeroMemory(buf, 4096);
+                        int BytesReceived = recv(sock, buf, 4096, 0);
+                        if (BytesReceived)
+                        {
+                            // Do something with received bytes
+                        }
+                    }
+
                     painter *= -1;
                 }
             }
@@ -93,9 +163,11 @@ int WinMain()
             window.display();
             while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
             while (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
-            return 0;
+            break;
         }
     }
 
+    closesocket(sock);
+    WSACleanup();
     return 0;
 }
