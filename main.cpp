@@ -17,13 +17,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     if (wsResult != 0)
     {
-        MessageBox(0, 0, L"Can't start winsocket, error #" + wsResult, 0);
+        MessageBox(NULL, (L"Can't start winsocket, error #" + to_wstring(wsResult)).c_str(), 0, MB_ICONWARNING);
     }
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET)
     {
-        MessageBox(0, 0, L"Can't create socket, error #" + WSAGetLastError(), 0);
+        MessageBox(NULL, (L"Can't create socket, error #" + to_wstring( WSAGetLastError())).c_str(), 0, MB_ICONWARNING);
         WSACleanup();
         return 0;
     }
@@ -36,7 +36,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     int connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
     if (connResult == SOCKET_ERROR)
     {
-        MessageBox(0, 0, L"Can't connect to server, error #" + WSAGetLastError(), 0);
+        MessageBox(NULL, (L"Can't connect to server, error #" + to_wstring(WSAGetLastError())).c_str(), 0, MB_ICONWARNING);
         closesocket(sock);
         WSACleanup();
         return 0;
@@ -53,9 +53,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         for (int i = 0; i < 3; i++)
         {
-            zone newZone;
-            newZone.painter = zone::painterList::NONE;
-            newZone.coordinates = sf::Vector2f(i * 300, j * 300);
+            zone newZone(sf::Vector2f(i * 300, j * 300));
             zones.push_back(newZone);
         }
     }
@@ -105,39 +103,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 position /= 300;
                 if (zones[position.x + position.y * 3].painter == 0)
                 {
-                    zones[position.x + position.y * 3].painter = painter;
-
-                    // 0 1 2
-                    // 3 4 5
-                    // 6 7 8
-                    // 0,1,2  3,4,5  6,7,8  0,3,6  1,4,7  2,5,8  0,4,8  2,4,6
-                    if ((zones[0].painter != 0 && zones[0].painter == zones[1].painter && zones[0].painter == zones[2].painter) ||
-                        (zones[3].painter != 0 && zones[3].painter == zones[4].painter && zones[3].painter == zones[5].painter) ||
-                        (zones[6].painter != 0 && zones[6].painter == zones[7].painter && zones[6].painter == zones[8].painter) ||
-                        (zones[0].painter != 0 && zones[0].painter == zones[3].painter && zones[0].painter == zones[6].painter) ||
-                        (zones[1].painter != 0 && zones[1].painter == zones[4].painter && zones[1].painter == zones[7].painter) ||
-                        (zones[2].painter != 0 && zones[2].painter == zones[5].painter && zones[2].painter == zones[8].painter) ||
-                        (zones[0].painter != 0 && zones[0].painter == zones[4].painter && zones[0].painter == zones[8].painter) ||
-                        (zones[2].painter != 0 && zones[2].painter == zones[4].painter && zones[2].painter == zones[6].painter))
-                    {
-                        winner = painter;
-                    }
-
-                    if (winner != 0)
-                    {
-                        if (winner == -1)
-                        {
-                            userInput = "W1";
-                        }
-                        else if (winner == 1)
-                        {
-                            userInput = "W2";
-                        }
-                    }
-                    else
-                    {
-                        userInput = "P" + to_string(painter) + "X" + to_string(position.x) + "Y" + to_string(position.y);
-                    }
+                    userInput = "P" + to_string(painter) + "X" + to_string(position.x) + "Y" + to_string(position.y);
 
                     int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
                     if (sendResult != SOCKET_ERROR)
@@ -146,11 +112,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         int BytesReceived = recv(sock, buf, 4096, 0);
                         if (BytesReceived)
                         {
-                            // Do something with received bytes
+                            if (buf[0] == 'P')
+                            {
+                                if (buf[1] == '-')
+                                {
+                                    painter = -1;
+                                    zones[int(buf[4]) - '0' + (int(buf[6]) - '0') * 3].painter = painter;
+                                }
+                                else
+                                {
+                                    painter = 1;
+                                    zones[int(buf[3]) - '0' + (int(buf[5]) - '0') * 3].painter = painter;
+                                }
+                            }
+                            else if (buf[0] == 'W')
+                            {
+                                if (buf[1] == '1')
+                                {
+                                    winner = -1;
+                                }
+                                else
+                                {
+                                    winner = 1;
+                                }
+                            }
                         }
                     }
-
-                    painter *= -1;
                 }
             }
         }
@@ -161,7 +148,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 zones[i].Draw(&window);
             }
             window.display();
-            while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
             while (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
             break;
         }

@@ -12,7 +12,7 @@ public:
 		CROSS = 1
 	};
 	int painter = painterList::NONE;
-
+	zone(sf::Vector2f coordinates) : coordinates(coordinates) {}
 	void Draw(sf::RenderWindow *window);
 
 private:
