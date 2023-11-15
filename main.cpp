@@ -128,7 +128,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             }
                             else if (buf[0] == 'W')
                             {
-                                if (int(buf[1]) == zone::painterList::CIRCLE)
+                                if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
                                 {
                                     winner = zone::painterList::CIRCLE;
                                 }
