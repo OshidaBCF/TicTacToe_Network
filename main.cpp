@@ -97,11 +97,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
+            while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
             sf::Vector2i position = sf::Mouse::getPosition(window);
             if (position.x > 0 && position.x < window.getSize().x && position.y > 0 && position.y < window.getSize().y)
             {
                 position /= 300;
-                if (zones[position.x + position.y * 3].painter == 0)
+                if (zones[position.x + position.y * 3].painter == zone::painterList::NONE)
                 {
                     userInput = "P" + to_string(painter) + "X" + to_string(position.x) + "Y" + to_string(position.y);
 
@@ -114,26 +115,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         {
                             if (buf[0] == 'P')
                             {
-                                if (buf[1] == '-')
+                                if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
                                 {
-                                    painter = -1;
-                                    zones[int(buf[4]) - '0' + (int(buf[6]) - '0') * 3].painter = painter;
+                                    painter = zone::painterList::CIRCLE;
+                                    zones[int(buf[3]) - '0' + (int(buf[5]) - '0') * 3].painter = painter;
                                 }
                                 else
                                 {
-                                    painter = 1;
+                                    painter = zone::painterList::CROSS;
                                     zones[int(buf[3]) - '0' + (int(buf[5]) - '0') * 3].painter = painter;
                                 }
                             }
                             else if (buf[0] == 'W')
                             {
-                                if (buf[1] == '1')
+                                if (int(buf[1]) == zone::painterList::CIRCLE)
                                 {
-                                    winner = -1;
+                                    winner = zone::painterList::CIRCLE;
                                 }
                                 else
                                 {
-                                    winner = 1;
+                                    winner = zone::painterList::CROSS;
                                 }
                             }
                         }
