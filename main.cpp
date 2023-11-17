@@ -47,7 +47,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     sf::RenderWindow window(sf::VideoMode(900, 900), "SFML works!");
     std::vector<zone> zones;
-    int painter = zone::painterList::CIRCLE;
 
     for (int j = 0; j < 3; j++)
     {
@@ -58,6 +57,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
     }
 
+    int painter = 0;
+    int sendResult = send(sock, "Q", 2, 0);
+    if (sendResult != SOCKET_ERROR)
+    {
+        ZeroMemory(buf, 4096);
+        int BytesReceived = recv(sock, buf, 4096, 0);
+        if (BytesReceived)
+        {
+            painter = int(buf[1]) - '0';
+        }
+    }
     int winner = 0;
 
     while (window.isOpen())
@@ -113,7 +123,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         int BytesReceived = recv(sock, buf, 4096, 0);
                         if (BytesReceived)
                         {
-                            if (buf[0] == 'P')
+                            /*if (buf[0] == 'P')
                             {
                                 if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
                                 {
@@ -126,7 +136,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     zones[int(buf[3]) - '0' + (int(buf[5]) - '0') * 3].painter = painter;
                                 }
                             }
-                            else if (buf[0] == 'W')
+                            else */
+                            if (buf[0] == 'S')
+                            {
+                                for (int j = 0; j < 3; j++)
+                                {
+                                    for (int i = 0; i < 3; i++)
+                                    {
+                                        zones[i + j * 3].painter = int(buf[1 + (i + j * 3)]) - '0';
+                                    }
+                                }
+                                for (int i = 0; i < 9; i++)
+                                {
+                                    zones[i].Draw(&window);
+                                }
+                                window.display();
+                            }
+                            if (buf[0] == 'W')
                             {
                                 if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
                                 {
@@ -135,6 +161,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 else
                                 {
                                     winner = zone::painterList::CROSS;
+                                }
+                            }
+
+                            ZeroMemory(buf, 4096);
+                            int BytesReceived = recv(sock, buf, 4096, 0);
+                            if (BytesReceived)
+                            {
+                                if (buf[0] == 'S')
+                                {
+                                    for (int j = 0; j < 3; j++)
+                                    {
+                                        for (int i = 0; i < 3; i++)
+                                        {
+                                            zones[i + j * 3].painter = int(buf[1 + (i + j * 3)]) - '0';
+                                        }
+                                    }
+                                    for (int i = 0; i < 9; i++)
+                                    {
+                                        zones[i].Draw(&window);
+                                    }
+                                    window.display();
                                 }
                             }
                         }
