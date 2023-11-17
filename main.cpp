@@ -123,20 +123,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         int BytesReceived = recv(sock, buf, 4096, 0);
                         if (BytesReceived)
                         {
-                            /*if (buf[0] == 'P')
-                            {
-                                if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
-                                {
-                                    painter = zone::painterList::CIRCLE;
-                                    zones[int(buf[3]) - '0' + (int(buf[5]) - '0') * 3].painter = painter;
-                                }
-                                else
-                                {
-                                    painter = zone::painterList::CROSS;
-                                    zones[int(buf[3]) - '0' + (int(buf[5]) - '0') * 3].painter = painter;
-                                }
-                            }
-                            else */
                             if (buf[0] == 'S')
                             {
                                 for (int j = 0; j < 3; j++)
