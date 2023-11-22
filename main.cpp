@@ -45,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     char buf[4096];
     string userInput;
 
-    sf::RenderWindow window(sf::VideoMode(900, 900), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(1800, 900), "TicTacToe online!");
     std::vector<zone> zones;
     int painter = zone::painterList::CIRCLE;
 
@@ -53,7 +53,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         for (int i = 0; i < 3; i++)
         {
-            zone newZone(sf::Vector2f(i * 300, j * 300));
+            zone newZone(sf::Vector2f(i * 250, j * 250));
             zones.push_back(newZone);
         }
     }
@@ -75,24 +75,56 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             zones[i].Draw(&window);
         }
 
+        sf::Font font;
+        if (!font.loadFromFile("TicTacToe_Network/Roboto/Roboto-Black.ttf"))
+        {
+           // return EXIT_FAILURE;.ttf
+        }
+
+        sf::Text Player1;
+        Player1.setFont(font);
+        Player1.setString("Player 1");
+        Player1.setCharacterSize(15);
+        Player1.setFillColor(sf::Color::Blue);
+        Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
+        Player1.setPosition(900, 100);
+        window.draw(Player1);
+
+        sf::Text Player2;
+        Player2.setFont(font);
+        Player2.setString("Player 2");
+        Player2.setCharacterSize(15);
+        Player2.setFillColor(sf::Color::Red);
+        Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
+        Player1.setPosition(900, 100);
+        window.draw(Player2);
+
         sf::Vertex line[] =
         {
+            // vecteur lignes
             sf::Vertex(sf::Vector2f(300, 0)),
-            sf::Vertex(sf::Vector2f(300, 900))
+            sf::Vertex(sf::Vector2f(300, 900)),
         };
         window.draw(line, 2, sf::Lines);
 
-        line[0] = sf::Vertex(sf::Vector2f(600, 0));
+        line[0] = sf::Vertex(sf::Vector2f(600, 0)); // ligne vertical
         line[1] = sf::Vertex(sf::Vector2f(600, 900));
         window.draw(line, 2, sf::Lines);
 
-        line[0] = sf::Vertex(sf::Vector2f(0, 300));
+        line[0] = sf::Vertex(sf::Vector2f(0, 300)); // ligne horizontal
         line[1] = sf::Vertex(sf::Vector2f(900, 300));
         window.draw(line, 2, sf::Lines);
 
+        // Dessiner la troisième colonne verticale
+        line[0] = sf::Vertex(sf::Vector2f(900, 0));
+        line[1] = sf::Vertex(sf::Vector2f(900, 900));
+        window.draw(line, 2, sf::Lines);
+
+        // ligne fermant la colonne.
         line[0] = sf::Vertex(sf::Vector2f(0, 600));
         line[1] = sf::Vertex(sf::Vector2f(900, 600));
         window.draw(line, 2, sf::Lines);
+
         window.display();
 
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
