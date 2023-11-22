@@ -45,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     char buf[4096];
     string userInput;
 
-    sf::RenderWindow window(sf::VideoMode(900, 900), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(900, 900), "Amongus");
     std::vector<zone> zones;
 
     for (int j = 0; j < 3; j++)
@@ -68,6 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             painter = int(buf[1]) - '0';
         }
     }
+
     sendResult = send(sock, "S", 2, 0);
     if (sendResult != SOCKET_ERROR)
     {
@@ -171,27 +172,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 else
                                 {
                                     winner = zone::painterList::CROSS;
-                                }
-                            }
-
-                            ZeroMemory(buf, 4096);
-                            int BytesReceived = recv(sock, buf, 4096, 0);
-                            if (BytesReceived)
-                            {
-                                if (buf[0] == 'S')
-                                {
-                                    for (int j = 0; j < 3; j++)
-                                    {
-                                        for (int i = 0; i < 3; i++)
-                                        {
-                                            zones[i + j * 3].painter = int(buf[1 + (i + j * 3)]) - '0';
-                                        }
-                                    }
-                                    for (int i = 0; i < 9; i++)
-                                    {
-                                        zones[i].Draw(&window);
-                                    }
-                                    window.display();
                                 }
                             }
                         }
