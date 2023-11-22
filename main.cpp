@@ -1,6 +1,7 @@
 #include "Zone.h"
 #include <SFML/Window/Mouse.hpp>
 #include <string>
+#include <iostream>
 #include <WS2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 
@@ -74,12 +75,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             zones[i].Draw(&window);
         }
-
         sf::Font font;
-        if (!font.loadFromFile("TicTacToe_Network/Roboto/Roboto-Black.ttf"))
+  
+        if (font.loadFromFile("Roboto-Black.ttf"))
         {
-           // return EXIT_FAILURE;.ttf
+            return EXIT_FAILURE;
         }
+       
 
         sf::Text Player1;
         Player1.setFont(font);

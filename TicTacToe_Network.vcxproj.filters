@@ -26,5 +26,8 @@
     <ClInclude Include="Zone.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadLissener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
