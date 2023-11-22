@@ -97,8 +97,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Player2.setString("Player 2");
         Player2.setCharacterSize(30);
         Player2.setFillColor(sf::Color::Red);
-        Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
-        Player1.setPosition(1500, 100);
+        Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
+        Player2.setPosition(1500, 100);
         window.draw(Player2);
 
         sf::Vertex line[] =
