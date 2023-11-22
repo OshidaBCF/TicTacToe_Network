@@ -77,7 +77,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         sf::Font font;
   
-        if (font.loadFromFile("Roboto-Black.ttf"))
+        if (!font.loadFromFile("Roboto-Black.ttf"))
         {
             return EXIT_FAILURE;
         }
@@ -86,19 +86,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         sf::Text Player1;
         Player1.setFont(font);
         Player1.setString("Player 1");
-        Player1.setCharacterSize(15);
+        Player1.setCharacterSize(30);
         Player1.setFillColor(sf::Color::Blue);
         Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
-        Player1.setPosition(900, 100);
+        Player1.setPosition(1000, 100);
         window.draw(Player1);
 
         sf::Text Player2;
         Player2.setFont(font);
         Player2.setString("Player 2");
-        Player2.setCharacterSize(15);
+        Player2.setCharacterSize(30);
         Player2.setFillColor(sf::Color::Red);
         Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
-        Player1.setPosition(900, 100);
+        Player1.setPosition(1500, 100);
         window.draw(Player2);
 
         sf::Vertex line[] =
