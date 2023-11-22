@@ -1,13 +1,148 @@
 #include "Zone.h"
 #include <SFML/Window/Mouse.hpp>
 #include <string>
+#include <vector>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WS2tcpip.h>
+#include <processthreadsapi.h>
 #pragma comment(lib, "ws2_32.lib")
 
 using namespace std;
 
+#define WEB_SOCKET_EVENT (WM_USER + 1)
+
+SOCKET sock;
+int winner = 0;
+char buf[4096];
+string userInput;
+std::vector<zone> zones;
+int painter = 0;
+sf::RenderWindow window(sf::VideoMode(900, 900), "Amongus");
+
+void readNotification();
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    SOCKET Accept;
+    switch (uMsg) {
+    case WM_CLOSE:
+        // Gérer l'événement de fermeture de la fenêtre
+        MessageBox(NULL, L"Fermeture de la fenêtre cachée.", L"Événement", MB_ICONINFORMATION);
+        DestroyWindow(hwnd);
+        break;
+    case WM_DESTROY:
+        // Gérer la destruction de la fenêtre
+        PostQuitMessage(0);
+        break;
+    
+    case WEB_SOCKET_EVENT:
+    {
+        switch (WSAGETSELECTEVENT(lParam))
+        {
+        case FD_READ:
+        {
+            readNotification();
+        }
+        break;
+        case FD_CLOSE:
+            closesocket((SOCKET)wParam);
+            break;
+        }
+    }
+    break;
+    default:
+        // Laisser les autres messages être gérés par la procédure par défaut
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+
+    return 0;
+}
+
+void readNotification()
+{
+    ZeroMemory(buf, 4096);
+    int BytesReceived = recv(sock, buf, 4096, 0);
+    if (BytesReceived)
+    {
+        if (buf[0] == 'Q')
+        {
+            painter = int(buf[1]) - '0';
+            for (int j = 0; j < 3; j++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    zones[i + j * 3].painter = int(buf[3 + (i + j * 3)]) - '0';
+                }
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                zones[i].Draw(&window);
+            }
+            window.display();
+        }
+        if (buf[0] == 'S')
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    zones[i + j * 3].painter = int(buf[1 + (i + j * 3)]) - '0';
+                }
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                zones[i].Draw(&window);
+            }
+            window.display();
+        }
+        if (buf[0] == 'W')
+        {
+            if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
+            {
+                winner = zone::painterList::CIRCLE;
+            }
+            else
+            {
+                winner = zone::painterList::CROSS;
+            }
+        }
+    }
+}
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+    // Creation de la window class
+    HINSTANCE hiddenHInstance = GetModuleHandle(NULL);
+
+    // Définir la classe de la fenêtre
+    WNDCLASS windowClass = {};
+    windowClass.lpfnWndProc = WindowProc;
+    windowClass.hInstance = hiddenHInstance;
+    windowClass.lpszClassName = L"MyHiddenWindowClass";
+
+    // Enregistrer la classe de fenêtre
+    RegisterClass(&windowClass);
+
+    // Créer la fenêtre cachée
+    HWND hiddenWindow = CreateWindowEx(
+        0,                              // Styles étendus
+        L"MyHiddenWindowClass",        // Nom de la classe
+        L"MyHiddenWindow",              // Titre de la fenêtre
+        WS_OVERLAPPEDWINDOW,// Style de la fenêtre (fenêtre cachée)
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hiddenHInstance, NULL);
+
+    // Vérifier si la fenêtre a été créée avec succès
+    if (hiddenWindow == NULL) {
+        MessageBox(NULL, L"Erreur lors de la création de la fenêtre cachée.", L"Erreur", MB_ICONERROR);
+        return 1;
+    }
+
+    // Afficher la fenêtre cachée (si nécessaire)
+    // ShowWindow(hiddenWindow, SW_SHOWNORMAL);
+
+    // cout << "Server Main thread running...\n";
+
     string Host = "127.0.0.1"; // Server IP
     int Port = 5004; // Server Port
 
@@ -20,7 +155,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         MessageBox(NULL, (L"Can't start winsocket, error #" + to_wstring(wsResult)).c_str(), 0, MB_ICONWARNING);
     }
 
-    SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET)
     {
         MessageBox(NULL, (L"Can't create socket, error #" + to_wstring( WSAGetLastError())).c_str(), 0, MB_ICONWARNING);
@@ -42,11 +177,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
-    char buf[4096];
-    string userInput;
-
-    sf::RenderWindow window(sf::VideoMode(900, 900), "Amongus");
-    std::vector<zone> zones;
+    WSAAsyncSelect(sock, hiddenWindow, WEB_SOCKET_EVENT, FD_READ | FD_CLOSE);
 
     for (int j = 0; j < 3; j++)
     {
@@ -56,44 +187,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             zones.push_back(newZone);
         }
     }
-
-    int painter = 0;
-    int sendResult = send(sock, "Q", 2, 0);
-    if (sendResult != SOCKET_ERROR)
-    {
-        ZeroMemory(buf, 4096);
-        int BytesReceived = recv(sock, buf, 4096, 0);
-        if (BytesReceived)
-        {
-            painter = int(buf[1]) - '0';
-        }
-    }
-
-    sendResult = send(sock, "S", 2, 0);
-    if (sendResult != SOCKET_ERROR)
-    {
-        ZeroMemory(buf, 4096);
-        int BytesReceived = recv(sock, buf, 4096, 0);
-        if (BytesReceived)
-        {
-            if (buf[0] == 'S')
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        zones[i + j * 3].painter = int(buf[1 + (i + j * 3)]) - '0';
-                    }
-                }
-                for (int i = 0; i < 9; i++)
-                {
-                    zones[i].Draw(&window);
-                }
-                window.display();
-            }
-        }
-    }
-    int winner = 0;
 
     while (window.isOpen())
     {
