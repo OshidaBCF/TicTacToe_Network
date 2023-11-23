@@ -137,10 +137,15 @@ void readNotification()
                 winner = zone::painterList::CIRCLE;
                 textStatus = textStatusList::P1WIN;
             }
-            else
+            else if (int(buf[11]) - '0' == zone::painterList::CROSS)
             {
                 winner = zone::painterList::CROSS;
                 textStatus = textStatusList::P2WIN;
+            }
+            else if (int(buf[11]) - '0' == zone::painterList::NONE)
+            {
+                winner = -1; 
+                textStatus = textStatusList::DRAW;
             }
         }
     }
@@ -271,7 +276,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     sf::Text turnPlayer1;
     turnPlayer1.setFont(font);
-    turnPlayer1.setString("position");
     turnPlayer1.setCharacterSize(30);
     turnPlayer1.setFillColor(sf::Color::Blue);
     turnPlayer1.setStyle(sf::Text::Bold | sf::Text::Underlined);
@@ -437,20 +441,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         int BytesReceived = recv(sock, buf, 4096, 0);
                         if (BytesReceived)
                         {
-                            /*if (buf[0] != 'N')
-                            {
-                                if (painter == zone::painterList::CIRCLE)
-                                    textStatus = textStatusList::P1TURN;
-                                else
-                                    textStatus = textStatusList::P2TURN;
-                            }
-                            else
-                            {
-                                if (painter == zone::painterList::CIRCLE)
-                                    textStatus = textStatusList::P1TURN;
-                                else
-                                    textStatus = textStatusList::P2TURN;
-                            }*/
                             if (buf[0] == 'S')
                             {
                                 for (int j = 0; j < 3; j++)
@@ -465,19 +455,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                     zones[i].Draw(&window);
                                 }
                                 window.display();
-                            }
-                            if (buf[0] == 'W')
-                            {
-                                if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
-                                {
-                                    winner = zone::painterList::CIRCLE;
-                                    textStatus = textStatusList::P1WIN;
-                                }
-                                else
-                                {
-                                    winner = zone::painterList::CROSS;
-                                    textStatus = textStatusList::P2WIN;
-                                }
                             }
                         }
                     }
