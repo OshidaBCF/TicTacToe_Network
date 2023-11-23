@@ -275,14 +275,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     turnPlayer1.setCharacterSize(30);
     turnPlayer1.setFillColor(sf::Color::Blue);
     turnPlayer1.setStyle(sf::Text::Bold | sf::Text::Underlined);
-    turnPlayer1.setPosition(1200, 500);
+    turnPlayer1.setPosition(1300, 500);
 
     sf::Text turnPlayer2;
     turnPlayer2.setFont(font);
     turnPlayer2.setCharacterSize(30);
     turnPlayer2.setFillColor(sf::Color::Red);
     turnPlayer2.setStyle(sf::Text::Bold | sf::Text::Underlined);
-    turnPlayer2.setPosition(1200, 500);
+    turnPlayer2.setPosition(1300, 500);
 
     while (window.isOpen())
     {
