@@ -18,7 +18,7 @@ char buf[4096];
 string userInput;
 std::vector<zone> zones;
 int painter = 0;
-sf::RenderWindow window(sf::VideoMode(900, 900), "Amongus");
+sf::RenderWindow window(sf::VideoMode(1800, 900), "TicTacToe online!");
 
 void readNotification();
 
@@ -184,7 +184,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         for (int i = 0; i < 3; i++)
         {
-            zone newZone(sf::Vector2f(i * 250, j * 250));
+            zone newZone(sf::Vector2f(i * 300, j * 300));
             zones.push_back(newZone);
         }
     }
@@ -207,7 +207,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   
         if (!font.loadFromFile("Roboto-Black.ttf"))
         {
-            return EXIT_FAILURE;
+            //return EXIT_FAILURE;
         }
        
 
@@ -245,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         line[1] = sf::Vertex(sf::Vector2f(900, 300));
         window.draw(line, 2, sf::Lines);
 
-        // Dessiner la troisiÃ¨me colonne verticale
+        // Dessiner la troisieme colonne verticale
         line[0] = sf::Vertex(sf::Vector2f(900, 0));
         line[1] = sf::Vertex(sf::Vector2f(900, 900));
         window.draw(line, 2, sf::Lines);
