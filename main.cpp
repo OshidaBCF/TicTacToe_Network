@@ -263,12 +263,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     sf::Text Text;
     Text.setFont(font);
+    Text.setString("C'est le tour de ");
     Text.setCharacterSize(30);
     Text.setFillColor(sf::Color::White);
     Text.setStyle(sf::Text::Bold);
     Text.setPosition(1050, 500);
 
-    //============================================
+    sf::Text turnPlayer1;
+    turnPlayer1.setFont(font);
+    turnPlayer1.setString("position");
+    turnPlayer1.setCharacterSize(30);
+    turnPlayer1.setFillColor(sf::Color::Blue);
+    turnPlayer1.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    turnPlayer1.setPosition(1200, 500);
+
+    sf::Text turnPlayer2;
+    turnPlayer2.setFont(font);
+    turnPlayer2.setCharacterSize(30);
+    turnPlayer2.setFillColor(sf::Color::Red);
+    turnPlayer2.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    turnPlayer2.setPosition(1200, 500);
 
     while (window.isOpen())
     {
@@ -310,8 +324,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         window.clear();
 
-        //============================
-        
         if (!isPseudoEntered)
         {
             window.clear();
@@ -320,8 +332,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             window.display();
             continue;
         }
-
-        //============================
 
         for (int i = 0; i < 9; i++)
         {
@@ -338,35 +348,45 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             Text.setString("");
         }
         break;
-        case textStatusList::DRAW:
-        {
-            Text.setString("Match Nul");
-        }
-        break;
         case textStatusList::P1TURN:
         {
-            Text.setString("C'est aux tour des Cercles");
+            turnPlayer1.setString(pseudo1);
+            turnPlayer2.setString("");
         }
         break;
         case textStatusList::P2TURN:
         {
-            Text.setString("C'est aux tour des Croix");
+            turnPlayer1.setString("");
+            turnPlayer2.setString(pseudo2);
         }
         break;
         case textStatusList::P1WIN:
         {
-            Text.setString("Les Cercles gagne");
+            Text.setString("Le gagnant est");
+            turnPlayer1.setString(pseudo1);
+            turnPlayer2.setString("");
         }
         break;
         case textStatusList::P2WIN:
         {
-            Text.setString("Les Croix gagne");
+            Text.setString("Le gagnant est");
+            turnPlayer1.setString("");
+            turnPlayer2.setString(pseudo1);
+        }
+        break;
+        case textStatusList::DRAW:
+        {
+            turnPlayer1.setString("");
+            turnPlayer2.setString("");
+            Text.setString("Match Nul");
         }
         break;
         }
         window.draw(Player1);
         window.draw(Player2);
         window.draw(Text);
+        window.draw(turnPlayer1);
+        window.draw(turnPlayer2);
 
         sf::Vertex line[] =
         {
