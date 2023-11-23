@@ -18,6 +18,7 @@ char buf[4096];
 string userInput;
 std::vector<zone> zones;
 int painter = 0;
+int currentPainter = 0;
 sf::RenderWindow window(sf::VideoMode(1800, 900), "TicTacToe online!");
 
 void readNotification();
@@ -229,6 +230,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Player2.setPosition(1500, 100);
         window.draw(Player2);
 
+        // Turn line
+        switch (currentPainter)
+        {
+        case zone::painterList::CIRCLE:
+        {
+            continue;
+        }
+        break;
+        case zone::painterList::CROSS:
+        {
+            continue;
+        }
+        break;
+        default:
+            continue;
+        }
+
         sf::Vertex line[] =
         {
             // vecteur lignes
@@ -275,6 +293,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         int BytesReceived = recv(sock, buf, 4096, 0);
                         if (BytesReceived)
                         {
+                            if (buf[0] != 'N')
+                            {
+                                currentPainter = painter;
+                            }
                             if (buf[0] == 'S')
                             {
                                 for (int j = 0; j < 3; j++)
