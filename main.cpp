@@ -110,6 +110,16 @@ void readNotification()
     }
 }
 
+enum textStatus
+{
+    NONE = 0,
+    DRAW,
+    P1TURN,
+    P2TURN,
+    P1WIN,
+    P2WIN
+
+};
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -208,7 +218,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   
         if (!font.loadFromFile("Roboto-Black.ttf"))
         {
-            //return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
        
 
@@ -231,7 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         window.draw(Player2);
 
         // Turn line
-        switch (currentPainter)
+        /*switch (currentPainter)
         {
         case zone::painterList::CIRCLE:
         {
@@ -245,7 +255,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         break;
         default:
             continue;
-        }
+        }*/
 
         sf::Vertex line[] =
         {
