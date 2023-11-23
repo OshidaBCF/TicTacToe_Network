@@ -1,6 +1,7 @@
 #include "Zone.h"
 #include <SFML/Window/Mouse.hpp>
 #include <string>
+#include <iostream>
 #include <vector>
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WS2tcpip.h>
@@ -25,12 +26,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     SOCKET Accept;
     switch (uMsg) {
     case WM_CLOSE:
-        // Gérer l'événement de fermeture de la fenêtre
-        MessageBox(NULL, L"Fermeture de la fenêtre cachée.", L"Événement", MB_ICONINFORMATION);
+        // GÃ©rer l'Ã©vÃ©nement de fermeture de la fenÃªtre
+        MessageBox(NULL, L"Fermeture de la fenÃªtre cachÃ©e.", L"Ã‰vÃ©nement", MB_ICONINFORMATION);
         DestroyWindow(hwnd);
         break;
     case WM_DESTROY:
-        // Gérer la destruction de la fenêtre
+        // GÃ©rer la destruction de la fenÃªtre
         PostQuitMessage(0);
         break;
     
@@ -50,7 +51,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
     break;
     default:
-        // Laisser les autres messages être gérés par la procédure par défaut
+        // Laisser les autres messages Ãªtre gÃ©rÃ©s par la procÃ©dure par dÃ©faut
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
 
@@ -114,31 +115,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Creation de la window class
     HINSTANCE hiddenHInstance = GetModuleHandle(NULL);
 
-    // Définir la classe de la fenêtre
+    // DÃ©finir la classe de la fenÃªtre
     WNDCLASS windowClass = {};
     windowClass.lpfnWndProc = WindowProc;
     windowClass.hInstance = hiddenHInstance;
     windowClass.lpszClassName = L"MyHiddenWindowClass";
 
-    // Enregistrer la classe de fenêtre
+    // Enregistrer la classe de fenÃªtre
     RegisterClass(&windowClass);
 
-    // Créer la fenêtre cachée
+    // CrÃ©er la fenÃªtre cachÃ©e
     HWND hiddenWindow = CreateWindowEx(
-        0,                              // Styles étendus
+        0,                              // Styles Ã©tendus
         L"MyHiddenWindowClass",        // Nom de la classe
-        L"MyHiddenWindow",              // Titre de la fenêtre
-        WS_OVERLAPPEDWINDOW,// Style de la fenêtre (fenêtre cachée)
+        L"MyHiddenWindow",              // Titre de la fenÃªtre
+        WS_OVERLAPPEDWINDOW,// Style de la fenÃªtre (fenÃªtre cachÃ©e)
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
         NULL, NULL, hiddenHInstance, NULL);
 
-    // Vérifier si la fenêtre a été créée avec succès
+    // VÃ©rifier si la fenÃªtre a Ã©tÃ© crÃ©Ã©e avec succÃ¨s
     if (hiddenWindow == NULL) {
-        MessageBox(NULL, L"Erreur lors de la création de la fenêtre cachée.", L"Erreur", MB_ICONERROR);
+        MessageBox(NULL, L"Erreur lors de la crÃ©ation de la fenÃªtre cachÃ©e.", L"Erreur", MB_ICONERROR);
         return 1;
     }
 
-    // Afficher la fenêtre cachée (si nécessaire)
+    // Afficher la fenÃªtre cachÃ©e (si nÃ©cessaire)
     // ShowWindow(hiddenWindow, SW_SHOWNORMAL);
 
     // cout << "Server Main thread running...\n";
@@ -183,7 +184,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         for (int i = 0; i < 3; i++)
         {
-            zone newZone(sf::Vector2f(i * 300, j * 300));
+            zone newZone(sf::Vector2f(i * 250, j * 250));
             zones.push_back(newZone);
         }
     }
@@ -202,25 +203,58 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             zones[i].Draw(&window);
         }
+        sf::Font font;
+  
+        if (!font.loadFromFile("Roboto-Black.ttf"))
+        {
+            return EXIT_FAILURE;
+        }
+       
+
+        sf::Text Player1;
+        Player1.setFont(font);
+        Player1.setString("Player 1");
+        Player1.setCharacterSize(30);
+        Player1.setFillColor(sf::Color::Blue);
+        Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
+        Player1.setPosition(1000, 100);
+        window.draw(Player1);
+
+        sf::Text Player2;
+        Player2.setFont(font);
+        Player2.setString("Player 2");
+        Player2.setCharacterSize(30);
+        Player2.setFillColor(sf::Color::Red);
+        Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
+        Player2.setPosition(1500, 100);
+        window.draw(Player2);
 
         sf::Vertex line[] =
         {
+            // vecteur lignes
             sf::Vertex(sf::Vector2f(300, 0)),
-            sf::Vertex(sf::Vector2f(300, 900))
+            sf::Vertex(sf::Vector2f(300, 900)),
         };
         window.draw(line, 2, sf::Lines);
 
-        line[0] = sf::Vertex(sf::Vector2f(600, 0));
+        line[0] = sf::Vertex(sf::Vector2f(600, 0)); // ligne vertical
         line[1] = sf::Vertex(sf::Vector2f(600, 900));
         window.draw(line, 2, sf::Lines);
 
-        line[0] = sf::Vertex(sf::Vector2f(0, 300));
+        line[0] = sf::Vertex(sf::Vector2f(0, 300)); // ligne horizontal
         line[1] = sf::Vertex(sf::Vector2f(900, 300));
         window.draw(line, 2, sf::Lines);
 
+        // Dessiner la troisiÃƒÂ¨me colonne verticale
+        line[0] = sf::Vertex(sf::Vector2f(900, 0));
+        line[1] = sf::Vertex(sf::Vector2f(900, 900));
+        window.draw(line, 2, sf::Lines);
+
+        // ligne fermant la colonne.
         line[0] = sf::Vertex(sf::Vector2f(0, 600));
         line[1] = sf::Vertex(sf::Vector2f(900, 600));
         window.draw(line, 2, sf::Lines);
+
         window.display();
 
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
