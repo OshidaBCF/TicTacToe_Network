@@ -12,14 +12,24 @@ using namespace std;
 
 #define WEB_SOCKET_EVENT (WM_USER + 1)
 
+enum textStatusList
+{
+    NONE = 0,
+    DRAW,
+    P1TURN,
+    P2TURN,
+    P1WIN,
+    P2WIN
+};
+
 SOCKET sock;
 int winner = 0;
 char buf[4096];
 string userInput;
 std::vector<zone> zones;
 int painter = 0;
-int currentPainter = 0;
 sf::RenderWindow window(sf::VideoMode(1800, 900), "TicTacToe online!");
+textStatusList textStatus = textStatusList::P1TURN;
 
 void readNotification();
 
@@ -68,6 +78,7 @@ void readNotification()
         if (buf[0] == 'Q')
         {
             painter = int(buf[1]) - '0';
+
             for (int j = 0; j < 3; j++)
             {
                 for (int i = 0; i < 3; i++)
@@ -95,32 +106,26 @@ void readNotification()
                 zones[i].Draw(&window);
             }
             window.display();
+            if (textStatus == textStatusList::P2TURN)
+                textStatus = textStatusList::P1TURN;
+            else
+                textStatus = textStatusList::P2TURN;
         }
-        if (buf[0] == 'W')
+        if (buf[10] == 'W')
         {
             if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
             {
                 winner = zone::painterList::CIRCLE;
+                textStatus = textStatusList::P1WIN;
             }
             else
             {
                 winner = zone::painterList::CROSS;
+                textStatus = textStatusList::P2WIN;
             }
         }
     }
 }
-
-enum textStatusList
-{
-    NONE = 0,
-    DRAW,
-    P1TURN,
-    P2TURN,
-    P1WIN,
-    P2WIN
-};
-
-textStatusList textStatus = textStatusList::NONE;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -215,7 +220,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Player1.setFillColor(sf::Color::Blue);
     Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
     Player1.setPosition(1000, 100);
-    window.draw(Player1);
 
     sf::Text Player2;
     Player2.setFont(font);
@@ -224,7 +228,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Player2.setFillColor(sf::Color::Red);
     Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
     Player2.setPosition(1500, 100);
-    window.draw(Player2);
 
     sf::Text Text;
     Text.setFont(font);
@@ -253,35 +256,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
         case textStatusList::NONE:
         {
-            Text.setString("C'est le tour de Player 2");
+            Text.setString("");
         }
         break;
         case textStatusList::DRAW:
         {
-            Text.setString("C'est le tour de Player 2");
+            Text.setString("Match Nul");
         }
         break;
         case textStatusList::P1TURN:
         {
-            Text.setString("C'est le tour de Player 2");
+            Text.setString("C'est aux tour des Cercles");
         }
         break;
         case textStatusList::P2TURN:
         {
-            Text.setString("C'est le tour de Player 2");
+            Text.setString("C'est aux tour des Croix");
         }
         break;
         case textStatusList::P1WIN:
         {
-            Text.setString("C'est le tour de Player 2");
+            Text.setString("Les Cercles gagne");
         }
         break;
         case textStatusList::P2WIN:
         {
-            Text.setString("C'est le tour de Player 2");
+            Text.setString("Les Croix gagne");
         }
         break;
         }
+        window.draw(Player1);
+        window.draw(Player2);
         window.draw(Text);
 
         sf::Vertex line[] =
@@ -312,7 +317,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         window.display();
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && winner == zone::painterList::NONE)
         {
             while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
             sf::Vector2i position = sf::Mouse::getPosition(window);
@@ -330,10 +335,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         int BytesReceived = recv(sock, buf, 4096, 0);
                         if (BytesReceived)
                         {
-                            if (buf[0] != 'N')
+                            /*if (buf[0] != 'N')
                             {
-                                currentPainter = painter;
+                                if (painter == zone::painterList::CIRCLE)
+                                    textStatus = textStatusList::P1TURN;
+                                else
+                                    textStatus = textStatusList::P2TURN;
                             }
+                            else
+                            {
+                                if (painter == zone::painterList::CIRCLE)
+                                    textStatus = textStatusList::P1TURN;
+                                else
+                                    textStatus = textStatusList::P2TURN;
+                            }*/
                             if (buf[0] == 'S')
                             {
                                 for (int j = 0; j < 3; j++)
@@ -354,10 +369,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                                 if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
                                 {
                                     winner = zone::painterList::CIRCLE;
+                                    textStatus = textStatusList::P1WIN;
                                 }
                                 else
                                 {
                                     winner = zone::painterList::CROSS;
+                                    textStatus = textStatusList::P2WIN;
                                 }
                             }
                         }
@@ -365,7 +382,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 }
             }
         }
-        if (winner != 0)
+        /*if (winner != 0)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -374,7 +391,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             window.display();
             while (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
             break;
-        }
+        }*/
     }
 
     closesocket(sock);
