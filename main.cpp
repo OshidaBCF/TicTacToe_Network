@@ -103,13 +103,13 @@ void readNotification()
         }
         if (buf[0] == 'M')
         {
+            string temp;
             for (int i = 2; i < BytesReceived; i++)
             {
-                if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
-                    pseudo1 += buf[i];
-                else
-                    pseudo2 += buf[i];
+                temp += buf[i];
             }
+            pseudo1 = temp.substr(0, temp.find('\r'));
+            pseudo2 = temp.substr(temp.find('\r') + 3, temp.size());
         }
         if (buf[0] == 'S')
         {
