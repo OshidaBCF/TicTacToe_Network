@@ -156,7 +156,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // cout << "Server Main thread running...\n";
 
-    string Host = "10.1.170.34"; // Server IP
+    //string Host = "10.1.170.34"; // Server IP
+    string Host = "127.0.0.1";
     int Port = 5004; // Server Port
 
     WSAData data;
@@ -201,12 +202,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
     }
 
-
     sf::Font font;
     if (!font.loadFromFile("Roboto-Black.ttf"))
     {
         return EXIT_FAILURE;
     }
+
+    sf::Text askPseudo;
+    askPseudo.setFont(font);
+    askPseudo.setString("Choisissez votre pseudonyme.");
+    askPseudo.setCharacterSize(60);
+    askPseudo.setFillColor(sf::Color::White);
+    askPseudo.setStyle(sf::Text::Bold);
+    askPseudo.setPosition(window.getSize().x / 4, window.getSize().y /2 -100);
+
+    sf::Text enterPseudo;
+    enterPseudo.setFont(font);
+    enterPseudo.setCharacterSize(60);
+    enterPseudo.setFillColor(sf::Color::White);
+    enterPseudo.setStyle(sf::Text::Bold);
+    enterPseudo.setPosition(window.getSize().x / 4, window.getSize().y /2 + 100);
 
     sf::Text Player1;
     Player1.setFont(font);
@@ -215,7 +230,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Player1.setFillColor(sf::Color::Blue);
     Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
     Player1.setPosition(1000, 100);
-    window.draw(Player1);
 
     sf::Text Player2;
     Player2.setFont(font);
@@ -224,7 +238,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Player2.setFillColor(sf::Color::Red);
     Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
     Player2.setPosition(1500, 100);
-    window.draw(Player2);
 
     sf::Text Text;
     Text.setFont(font);
@@ -233,16 +246,61 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Text.setStyle(sf::Text::Bold);
     Text.setPosition(1050, 500);
 
+    //============================================
+
+    bool isPseudoEntered = false;
+
     while (window.isOpen())
     {
         sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+            }
+
+            // Gestion de la saisie du clavier
+            if (event.type == sf::Event::TextEntered)
+            {
+                if (event.text.unicode < 128) // Vérification si le caractère est valide
+                {
+                    if (event.text.unicode == '\b') // Vérification de la touche Backspace
+                    {
+                        if (!userInput.empty())
+                        {
+                            userInput.pop_back();
+                            enterPseudo.setString(userInput);
+                        }
+                    }
+                    else if (event.text.unicode == '\r') // Touche "Entrée" appuyée
+                    {
+                        isPseudoEntered = true; // Marquer que le pseudo est entré
+                    }
+                    else if (userInput.size() < 20) // Limite de caractères pour le pseudonyme
+                    {
+                        userInput += static_cast<char>(event.text.unicode);
+                        enterPseudo.setString(userInput);
+                    }
+                }
+            }
         }
 
         window.clear();
+
+        //============================
+        
+        if (!isPseudoEntered)
+        {
+            window.clear();
+            window.draw(askPseudo);
+            window.draw(enterPseudo);
+            window.display();
+            continue;
+        }
+
+        //============================
+
         for (int i = 0; i < 9; i++)
         {
             zones[i].Draw(&window);
@@ -282,6 +340,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         break;
         }
+        window.draw(Player1);
+        window.draw(Player2);
         window.draw(Text);
 
         sf::Vertex line[] =
