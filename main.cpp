@@ -31,6 +31,11 @@ int painter = 0;
 sf::RenderWindow window(sf::VideoMode(1800, 900), "TicTacToe online!");
 textStatusList textStatus = textStatusList::P1TURN;
 
+string pseudo1 = "";
+string pseudo2 = "";
+
+bool isPseudoEntered = false;
+
 void readNotification();
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -78,6 +83,10 @@ void readNotification()
         if (buf[0] == 'Q')
         {
             painter = int(buf[1]) - '0';
+            if (painter == zone::painterList::NONE)
+            {
+                isPseudoEntered = true;
+            }
 
             for (int j = 0; j < 3; j++)
             {
@@ -91,6 +100,16 @@ void readNotification()
                 zones[i].Draw(&window);
             }
             window.display();
+        }
+        if (buf[0] == 'M')
+        {
+            for (int i = 2; i < BytesReceived; i++)
+            {
+                if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
+                    pseudo1 += buf[i];
+                else
+                    pseudo2 += buf[i];
+            }
         }
         if (buf[0] == 'S')
         {
@@ -113,7 +132,7 @@ void readNotification()
         }
         if (buf[10] == 'W')
         {
-            if (int(buf[1]) - '0' == zone::painterList::CIRCLE)
+            if (int(buf[11]) - '0' == zone::painterList::CIRCLE)
             {
                 winner = zone::painterList::CIRCLE;
                 textStatus = textStatusList::P1WIN;
@@ -230,7 +249,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     sf::Text Player1;
     Player1.setFont(font);
-    Player1.setString("Player 1");
     Player1.setCharacterSize(30);
     Player1.setFillColor(sf::Color::Blue);
     Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
@@ -238,7 +256,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     sf::Text Player2;
     Player2.setFont(font);
-    Player2.setString("Player 2");
     Player2.setCharacterSize(30);
     Player2.setFillColor(sf::Color::Red);
     Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
@@ -253,8 +270,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     //============================================
 
-    bool isPseudoEntered = false;
-
     while (window.isOpen())
     {
         sf::Event event;
@@ -266,7 +281,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
 
             // Gestion de la saisie du clavier
-            if (event.type == sf::Event::TextEntered)
+            if (event.type == sf::Event::TextEntered && !isPseudoEntered)
             {
                 if (event.text.unicode < 128) // Vérification si le caractère est valide
                 {
@@ -281,6 +296,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     else if (event.text.unicode == '\r') // Touche "Entrée" appuyée
                     {
                         isPseudoEntered = true; // Marquer que le pseudo est entré
+                        string message = "M" + to_string(painter) + userInput;
+                        send(sock, message.c_str(), message.size(), 0);
                     }
                     else if (userInput.size() < 20) // Limite de caractères pour le pseudonyme
                     {
@@ -310,6 +327,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             zones[i].Draw(&window);
         }
+        Player1.setString(pseudo1);
+        Player2.setString(pseudo2);
 
         // Turn line;
         switch (textStatus)
