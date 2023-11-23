@@ -7,9 +7,9 @@ public:
 	sf::Vector2f coordinates;
 	enum painterList
 	{
-		CIRCLE = -1,
 		NONE = 0,
-		CROSS = 1
+		CIRCLE = 1,
+		CROSS = 2
 	};
 	int painter = painterList::NONE;
 	zone(sf::Vector2f coordinates) : coordinates(coordinates) {}
