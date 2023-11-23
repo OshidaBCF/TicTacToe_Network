@@ -227,7 +227,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Player1.setString("Player 1");
         Player1.setCharacterSize(30);
         Player1.setFillColor(sf::Color::Blue);
-        Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
+        Player1.setStyle(sf::Text::Bold);
         Player1.setPosition(1000, 100);
         window.draw(Player1);
 
@@ -236,7 +236,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Player2.setString("Player 2");
         Player2.setCharacterSize(30);
         Player2.setFillColor(sf::Color::Red);
-        Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
+        Player2.setStyle(sf::Text::Bold);
         Player2.setPosition(1500, 100);
         window.draw(Player2);
 
