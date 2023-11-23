@@ -155,7 +155,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // cout << "Server Main thread running...\n";
 
-    string Host = "127.0.0.1"; // Server IP
+    string Host = "10.1.170.34"; // Server IP
     int Port = 5004; // Server Port
 
     WSAData data;
