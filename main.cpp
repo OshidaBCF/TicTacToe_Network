@@ -24,7 +24,7 @@ sf::RenderWindow window(sf::VideoMode(1800, 900), "TicTacToe online!");
 void readNotification();
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    SOCKET Accept;
+    SOCKET Accept = 0;
     switch (uMsg) {
     case WM_CLOSE:
         // Gérer l'événement de fermeture de la fenêtre
@@ -110,7 +110,7 @@ void readNotification()
     }
 }
 
-enum textStatus
+enum textStatusList
 {
     NONE = 0,
     DRAW,
@@ -118,8 +118,9 @@ enum textStatus
     P2TURN,
     P1WIN,
     P2WIN
-
 };
+
+textStatusList textStatus = textStatusList::NONE;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -200,6 +201,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
     }
 
+
+    sf::Font font;
+    if (!font.loadFromFile("Roboto-Black.ttf"))
+    {
+        return EXIT_FAILURE;
+    }
+
+    sf::Text Player1;
+    Player1.setFont(font);
+    Player1.setString("Player 1");
+    Player1.setCharacterSize(30);
+    Player1.setFillColor(sf::Color::Blue);
+    Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    Player1.setPosition(1000, 100);
+    window.draw(Player1);
+
+    sf::Text Player2;
+    Player2.setFont(font);
+    Player2.setString("Player 2");
+    Player2.setCharacterSize(30);
+    Player2.setFillColor(sf::Color::Red);
+    Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    Player2.setPosition(1500, 100);
+    window.draw(Player2);
+
+    sf::Text Text;
+    Text.setFont(font);
+    Text.setCharacterSize(30);
+    Text.setFillColor(sf::Color::White);
+    Text.setStyle(sf::Text::Bold);
+    Text.setPosition(1050, 500);
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -214,48 +247,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             zones[i].Draw(&window);
         }
-        sf::Font font;
-  
-        if (!font.loadFromFile("Roboto-Black.ttf"))
-        {
-            return EXIT_FAILURE;
-        }
-       
 
-        sf::Text Player1;
-        Player1.setFont(font);
-        Player1.setString("Player 1");
-        Player1.setCharacterSize(30);
-        Player1.setFillColor(sf::Color::Blue);
-        Player1.setStyle(sf::Text::Bold | sf::Text::Underlined);
-        Player1.setPosition(1000, 100);
-        window.draw(Player1);
-
-        sf::Text Player2;
-        Player2.setFont(font);
-        Player2.setString("Player 2");
-        Player2.setCharacterSize(30);
-        Player2.setFillColor(sf::Color::Red);
-        Player2.setStyle(sf::Text::Bold | sf::Text::Underlined);
-        Player2.setPosition(1500, 100);
-        window.draw(Player2);
-
-        // Turn line
-        /*switch (currentPainter)
+        // Turn line;
+        switch (textStatus)
         {
-        case zone::painterList::CIRCLE:
+        case textStatusList::NONE:
         {
-            continue;
+            Text.setString("C'est le tour de Player 2");
         }
         break;
-        case zone::painterList::CROSS:
+        case textStatusList::DRAW:
         {
-            continue;
+            Text.setString("C'est le tour de Player 2");
         }
         break;
-        default:
-            continue;
-        }*/
+        case textStatusList::P1TURN:
+        {
+            Text.setString("C'est le tour de Player 2");
+        }
+        break;
+        case textStatusList::P2TURN:
+        {
+            Text.setString("C'est le tour de Player 2");
+        }
+        break;
+        case textStatusList::P1WIN:
+        {
+            Text.setString("C'est le tour de Player 2");
+        }
+        break;
+        case textStatusList::P2WIN:
+        {
+            Text.setString("C'est le tour de Player 2");
+        }
+        break;
+        }
+        window.draw(Text);
 
         sf::Vertex line[] =
         {
@@ -289,14 +316,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
             sf::Vector2i position = sf::Mouse::getPosition(window);
-            if (position.x > 0 && position.x < window.getSize().x && position.y > 0 && position.y < window.getSize().y)
+            if (position.x > 0 && position.x < 900 && position.y > 0 && position.y < 900)
             {
                 position /= 300;
                 if (zones[position.x + position.y * 3].painter == zone::painterList::NONE)
                 {
                     userInput = "P" + to_string(painter) + "X" + to_string(position.x) + "Y" + to_string(position.y);
 
-                    int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
+                    int sendResult = send(sock, userInput.c_str(), userInput.size(), 0);
                     if (sendResult != SOCKET_ERROR)
                     {
                         ZeroMemory(buf, 4096);
