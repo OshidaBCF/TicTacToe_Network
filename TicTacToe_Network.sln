@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TicTacToe_Network", "TicTacToe_Network.vcxproj", "{F8B0BE24-6F5D-4405-BC39-5AE1D9AED24A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{999BC56A-337F-4D11-939F-51A8AD170F41}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcxproj", "{F8B0BE24-6F5D-4405-BC39-5AE1D9AED24A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +15,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Debug|x64.ActiveCfg = Debug|x64
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Debug|x64.Build.0 = Debug|x64
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Debug|x86.ActiveCfg = Debug|Win32
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Debug|x86.Build.0 = Debug|Win32
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Release|x64.ActiveCfg = Release|x64
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Release|x64.Build.0 = Release|x64
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Release|x86.ActiveCfg = Release|Win32
+		{999BC56A-337F-4D11-939F-51A8AD170F41}.Release|x86.Build.0 = Release|Win32
 		{F8B0BE24-6F5D-4405-BC39-5AE1D9AED24A}.Debug|x64.ActiveCfg = Debug|x64
 		{F8B0BE24-6F5D-4405-BC39-5AE1D9AED24A}.Debug|x64.Build.0 = Debug|x64
 		{F8B0BE24-6F5D-4405-BC39-5AE1D9AED24A}.Debug|x86.ActiveCfg = Debug|Win32

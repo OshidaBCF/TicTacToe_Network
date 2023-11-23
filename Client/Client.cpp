@@ -99,6 +99,16 @@ void readNotification()
             {
                 zones[i].Draw(&window);
             }
+            if (buf[12] == 'M')
+            {
+                string temp;
+                for (int i = 14; i < BytesReceived; i++)
+                {
+                    temp += buf[i];
+                }
+                pseudo1 = temp.substr(0, temp.find('\r'));
+                pseudo2 = temp.substr(temp.find('\r') + 3, temp.size());
+            }
             window.display();
         }
         if (buf[0] == 'M')
@@ -378,7 +388,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             Text.setString("Le gagnant est");
             turnPlayer1.setString("");
-            turnPlayer2.setString(pseudo1);
+            turnPlayer2.setString(pseudo2);
         }
         break;
         case textStatusList::DRAW:
