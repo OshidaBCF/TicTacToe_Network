@@ -309,9 +309,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     }
                     else if (event.text.unicode == '\r') // Touche "Entrée" appuyée
                     {
-                        isPseudoEntered = true; // Marquer que le pseudo est entré
-                        string message = "M" + to_string(painter) + userInput;
-                        send(sock, message.c_str(), message.size(), 0);
+                        if (userInput != "")
+                        {
+                            isPseudoEntered = true; // Marquer que le pseudo est entré
+                            string message = "M" + to_string(painter) + userInput;
+                            send(sock, message.c_str(), message.size(), 0);
+                        }
                     }
                     else if (userInput.size() < 20) // Limite de caractères pour le pseudonyme
                     {
